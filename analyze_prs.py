@@ -55,6 +55,11 @@ Provide your assessment in this exact JSON format:
 
 def init_cache_db():
     """Initialize the SQLite cache database."""
+    # Create db directory if it doesn't exist
+    db_dir = os.path.dirname(CACHE_DB_PATH)
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+    
     conn = sqlite3.connect(CACHE_DB_PATH)
     cursor = conn.cursor()
     
@@ -81,6 +86,11 @@ def init_cache_db():
 
 def init_analysis_db():
     """Initialize the SQLite analysis database."""
+    # Create db directory if it doesn't exist
+    db_dir = os.path.dirname(ANALYSIS_DB_PATH)
+    if not os.path.exists(db_dir):
+        os.makedirs(db_dir)
+    
     conn = sqlite3.connect(ANALYSIS_DB_PATH)
     cursor = conn.cursor()
     
