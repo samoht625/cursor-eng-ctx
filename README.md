@@ -20,8 +20,8 @@ A command-line tool that analyzes local git repository merges and scores them ba
 
 1. Clone this repository:
 ```bash
-git clone <repo-url>
-cd eng-context
+git clone https://github.com/samoht625/cursor-eng-ctx.git
+cd cursor-eng-ctx
 ```
 
 2. (Optional) Create a virtual environment:
