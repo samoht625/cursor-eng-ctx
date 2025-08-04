@@ -59,19 +59,25 @@ cp .env.example .env
 
 ### Basic Usage
 
-Analyze merges from the last week for users in the config file:
+The main parameter you need is `--since` to specify the time period to analyze:
 
 ```bash
 python3 analyze_prs.py --since "1 week ago" --users users-config.txt
 ```
 
+**Required parameters:**
+- `--since`: Time period to analyze (e.g., "1 week ago", "2 months ago", "2024-01-01")
+- `--users`: List of users to analyze (CSV string or path to config file)
+
 Make sure you have set up your `.env` file with your OpenAI API key and repository path before running the analysis.
 
 ### Command-Line Options
 
+**Main Parameter:**
 - `--since`: Timestamp or relative time (required)
   - Examples: `"1 week ago"`, `"2 months ago"`, `"2024-01-01"`
-  
+
+**Advanced Parameters:**
 - `--users`: CSV of users or path to config file (required)
   - Examples: `"user1,user2,user3"` or `users-config.txt`
   
@@ -83,23 +89,26 @@ Make sure you have set up your `.env` file with your OpenAI API key and reposito
 
 ### Examples
 
-1. Analyze merges from the last 2 weeks for specific users:
+**Basic usage - just specify the time period:**
 ```bash
+python3 analyze_prs.py --since "1 week ago" --users users-config.txt
+```
+
+**Analyze different time periods:**
+```bash
+# Last 2 weeks
 python3 analyze_prs.py --since "2 weeks ago" --users "rnvarma,ehong97,ajhoffman"
-```
 
-2. Use a config file for users:
-```bash
+# Last month
 python3 analyze_prs.py --since "1 month ago" --users users-config.txt
-```
 
-3. Analyze merges since a specific date:
-```bash
+# Since specific date
 python3 analyze_prs.py --since "2024-01-01" --users users-config.txt
 ```
 
-4. Use GPT-3.5-turbo for lower costs:
+**Advanced options:**
 ```bash
+# Use GPT-3.5-turbo for lower costs
 python3 analyze_prs.py --since "1 week ago" --users users-config.txt --model gpt-3.5-turbo
 ```
 
