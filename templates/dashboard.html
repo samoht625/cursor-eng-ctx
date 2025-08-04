@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eng ctx</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #202124;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            background: #fff;
+            padding: 24px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        
+        header h1 {
+            color: #202124;
+            margin-bottom: 8px;
+            font-size: 2.5rem;
+            font-weight: 500;
+        }
+        
+        header p {
+            color: #5f6368;
+            font-size: 1.1rem;
+        }
+        
+        .time-filters {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .time-filter-btn {
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            color: #5f6368;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-radius: 4px;
+        }
+        
+        .time-filter-btn:hover {
+            background: #f1f3f4;
+            border-color: #1a73e8;
+            color: #1a73e8;
+        }
+        
+        .time-filter-btn.active {
+            background: #1a73e8;
+            border-color: #1a73e8;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .time-filters-label {
+            color: #5f6368;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: #fff;
+            padding: 24px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #5f6368;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 500;
+            color: #202124;
+        }
+        
+        .author-performance {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            margin-bottom: 24px;
+        }
+        
+        .section-header {
+            background: #fafafa;
+            color: #5f6368;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #e0e0e0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .author-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .author-table th {
+            background: #f8f9fa;
+            color: #202124;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            user-select: none;
+            font-size: 13px;
+        }
+        
+        .author-table th:hover {
+            background: #f1f3f4;
+        }
+        
+        .author-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+            font-size: 13px;
+        }
+        
+        .author-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .author-name {
+            color: #1a73e8;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .author-name:hover {
+            text-decoration: underline;
+        }
+        
+        .author-name.selected {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 600;
+        }
+        
+        .impact-score-cell {
+            text-align: left;
+        }
+        
+        .impact-points {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 4px;
+        }
+        
+        .impact-distribution-cell {
+            text-align: left;
+            padding: 8px 12px;
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: 60px 60px 60px 60px 60px;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .impact-coin {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: rgba(0,0,0,0.05);
+        }
+        
+        .impact-level {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        .impact-level-5 {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+        }
+        
+        .impact-level-4 {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            box-shadow: 0 2px 4px rgba(243, 156, 18, 0.3);
+        }
+        
+        .impact-level-3 {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            box-shadow: 0 2px 4px rgba(241, 196, 15, 0.3);
+        }
+        
+        .impact-level-2 {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+        }
+        
+        .impact-level-1 {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            box-shadow: 0 2px 4px rgba(149, 165, 166, 0.3);
+        }
+        
+        .impact-score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .score-excellent {
+            background: #fce8e6;
+            color: #d33b27;
+            border-color: #f5c6c0;
+        }
+        
+        .score-good {
+            background: #fef7e0;
+            color: #e37400;
+            border-color: #fde293;
+        }
+        
+        .score-average {
+            background: #e3f2fd;
+            color: #1976d2;
+            border-color: #90caf9;
+        }
+        
+        .score-poor {
+            background: #f5f5f5;
+            color: #5f6368;
+            border-color: #e0e0e0;
+        }
+        
+        .analyses-container {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .analyses-container.show {
+            display: block;
+        }
+        
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .analysis-table th {
+            background: #f8f9fa;
+            color: #202124;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 500;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+        
+        .analysis-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: top;
+            font-size: 13px;
+        }
+        
+        .analysis-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .commit-link {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .commit-link:hover {
+            text-decoration: underline;
+        }
+        
+        .code-changes {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+        
+        .additions {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .deletions {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .author-cell {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .timestamp-cell {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .impact-score {
+            display: inline-block;
+            padding: 2px 8px;
+            font-weight: 500;
+            font-size: 12px;
+            border: 1px solid;
+        }
+        
+        .assessment-cell {
+            max-width: 400px;
+            font-size: 13px;
+            line-height: 1.4;
+            color: #202124;
+        }
+        
+        .view-all-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 16px;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        
+        .view-all-btn:hover {
+            background: #1557b0;
+        }
+        
+        .back-btn {
+            background: #5f6368;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 16px;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+        
+        .back-btn:hover {
+            background: #4d5156;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .selected-author-info {
+            background: #e3f2fd;
+            padding: 15px 25px;
+            border-bottom: 1px solid #ecf0f1;
+            font-weight: 600;
+            color: #1976d2;
+        }
+        
+        @media (max-width: 1200px) {
+            .analysis-table, .author-table {
+                font-size: 0.9rem;
+            }
+            
+            .analysis-table th, .analysis-table td,
+            .author-table th, .author-table td {
+                padding: 12px 15px;
+            }
+            
+            .assessment-cell {
+                max-width: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .analysis-table, .author-table {
+                font-size: 0.8rem;
+            }
+            
+            .analysis-table th, .analysis-table td,
+            .author-table th, .author-table td {
+                padding: 10px 12px;
+            }
+            
+            .assessment-cell {
+                max-width: 200px;
+            }
+        }
+        
+        .product-title {
+            font-family: 'Monaco', 'Menlo', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+            font-size: 3rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #222;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="product-title">eng ctx</h1>
+            
+            <div class="time-filters">
+                <div class="time-filters-label">Time Range:</div>
+                <a href="/?{% if current_author %}author={{ current_author|urlencode }}&{% endif %}{% if current_sort != 'impact_score' %}sort_by={{ current_sort }}&{% endif %}{% if current_order != 'desc' %}sort_order={{ current_order }}&{% endif %}" 
+                   class="time-filter-btn{% if not current_time_filter %} active{% endif %}">All Time</a>
+                <a href="/?time_filter=last_week{% if current_author %}&author={{ current_author|urlencode }}{% endif %}{% if current_sort != 'impact_score' %}&sort_by={{ current_sort }}{% endif %}{% if current_order != 'desc' %}&sort_order={{ current_order }}{% endif %}" 
+                   class="time-filter-btn{% if current_time_filter == 'last_week' %} active{% endif %}">Last Week</a>
+                <a href="/?time_filter=last_month{% if current_author %}&author={{ current_author|urlencode }}{% endif %}{% if current_sort != 'impact_score' %}&sort_by={{ current_sort }}{% endif %}{% if current_order != 'desc' %}&sort_order={{ current_order }}{% endif %}" 
+                   class="time-filter-btn{% if current_time_filter == 'last_month' %} active{% endif %}">Last Month</a>
+            </div>
+            
+            {% if current_time_filter or current_author %}
+            <div style="text-align: center; margin-top: 12px; padding: 8px; background: #e3f2fd; border-radius: 4px; font-size: 13px; color: #1976d2;">
+                <strong>Active Filters:</strong>
+                {% if current_time_filter %}
+                    {% if current_time_filter == 'last_week' %}Last Week{% elif current_time_filter == 'last_month' %}Last Month{% endif %}
+                {% endif %}
+                {% if current_author %}
+                    {% if current_time_filter %} • {% endif %}Author: {{ current_author }}
+                {% endif %}
+                <a href="/" style="margin-left: 8px; color: #1976d2; text-decoration: underline;">Clear All</a>
+            </div>
+            {% endif %}
+        </header>
+
+        <!-- Summary Statistics -->
+        <div class="stats-grid" id="statsSection">
+            <div class="stat-card">
+                <h3 id="totalLabel">Total Merges</h3>
+                <div class="value" id="totalValue">{{ stats.overall.total_analyses }}</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="impactLabel">Total Impact Points</h3>
+                <div class="value" id="impactValue">{{ stats.overall.impact_points }}</div>
+            </div>
+            <div class="stat-card">
+                <h3 id="changesLabel">Total Code Changes</h3>
+                <div class="value" id="changesValue">+{{ stats.overall.total_additions }} -{{ stats.overall.total_deletions }}</div>
+            </div>
+        </div>
+
+        <!-- Author Summary Section -->
+        <div class="author-performance" id="authorSummarySection">
+            <div class="section-header">
+                Author Summary ({{ authors|length }} authors)
+            </div>
+            <table class="author-table">
+                <thead>
+                    <tr>
+                        <th onclick="sortTable(0)">Author</th>
+                        <th onclick="sortTable(1)">Merges</th>
+                        <th onclick="sortTable(2)">Impact Points</th>
+                        <th onclick="sortTable(3)">Impact Distribution</th>
+                        <th onclick="sortTable(4)">Code Changes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for author in authors %}
+                    <tr>
+                        <td>
+                            <a href="/?author={{ author.author|urlencode }}{% if current_time_filter %}&time_filter={{ current_time_filter }}{% endif %}{% if current_sort != 'impact_score' %}&sort_by={{ current_sort }}{% endif %}{% if current_order != 'desc' %}&sort_order={{ current_order }}{% endif %}" class="author-name">
+                                {{ author.author }}
+                            </a>
+                        </td>
+                        <td>{{ author.merge_count }}</td>
+                        <td class="impact-score-cell">
+                            <span class="impact-points">{{ author.impact_points }} pts</span>
+                        </td>
+                        <td class="impact-distribution-cell">
+                            <div class="impact-grid">
+                                <span class="impact-grid-item" style="grid-column: 1;">
+                                    {% if author.distribution[5].count > 0 %}
+                                        <span class="impact-coin">
+                                            {{ author.distribution[5].count }}x <span class="impact-level impact-level-5">5</span>
+                                        </span>
+                                    {% endif %}
+                                </span>
+                                <span class="impact-grid-item" style="grid-column: 2;">
+                                    {% if author.distribution[4].count > 0 %}
+                                        <span class="impact-coin">
+                                            {{ author.distribution[4].count }}x <span class="impact-level impact-level-4">4</span>
+                                        </span>
+                                    {% endif %}
+                                </span>
+                                <span class="impact-grid-item" style="grid-column: 3;">
+                                    {% if author.distribution[3].count > 0 %}
+                                        <span class="impact-coin">
+                                            {{ author.distribution[3].count }}x <span class="impact-level impact-level-3">3</span>
+                                        </span>
+                                    {% endif %}
+                                </span>
+                                <span class="impact-grid-item" style="grid-column: 4;">
+                                    {% if author.distribution[2].count > 0 %}
+                                        <span class="impact-coin">
+                                            {{ author.distribution[2].count }}x <span class="impact-level impact-level-2">2</span>
+                                        </span>
+                                    {% endif %}
+                                </span>
+                                <span class="impact-grid-item" style="grid-column: 5;">
+                                    {% if author.distribution[1].count > 0 %}
+                                        <span class="impact-coin">
+                                            {{ author.distribution[1].count }}x <span class="impact-level impact-level-1">1</span>
+                                        </span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="code-changes">
+                                {{ author.total_files_changed }} files, 
+                                <span class="additions">+{{ author.total_additions }}</span>, 
+                                <span class="deletions">-{{ author.total_deletions }}</span>
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <button class="view-all-btn" onclick="viewAllAnalyses()">View All Analyses</button>
+        </div>
+
+        <!-- Analysis Results Table (Hidden by default) -->
+        <div class="analyses-container" id="analysesContainer">
+            <div class="section-header">
+                <span id="analysesTitle">Analysis Results</span>
+                <button class="back-btn" id="backBtn" onclick="goBack()" style="display: none;">← Back</button>
+            </div>
+            <div class="selected-author-info" id="selectedAuthorInfo" style="display: none;"></div>
+            
+            <table class="analysis-table">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th>Timestamp</th>
+                        <th>Commit Name</th>
+                        <th>Impact Score</th>
+                        <th>Impact Assessment</th>
+                    </tr>
+                </thead>
+                <tbody id="analysesTableBody">
+                    <!-- Content will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        // Store all analyses data
+        const allAnalyses = {{ analyses|tojson }};
+        const allAuthors = {{ authors|tojson }};
+        const currentAuthorFilter = "{{ current_author or '' }}";
+        const currentTimeFilter = "{{ current_time_filter or '' }}";
+        let currentFilter = null;
+        
+        function updateStatsForAuthor(authorName) {
+            // Find author stats
+            const authorStats = allAuthors.find(a => a.author === authorName);
+            if (!authorStats) return;
+            
+            // Update labels and values
+                            document.getElementById('totalLabel').textContent = `Total Merges (${authorName})`;
+            document.getElementById('totalValue').textContent = authorStats.merge_count;
+            
+            document.getElementById('impactLabel').textContent = `Total Impact Points (${authorName})`;
+            document.getElementById('impactValue').textContent = authorStats.impact_points;
+            
+            document.getElementById('changesLabel').textContent = `Total Code Changes (${authorName})`;
+            document.getElementById('changesValue').textContent = `+${authorStats.total_additions} -${authorStats.total_deletions}`;
+        }
+        
+        function resetStatsToOverall() {
+                            document.getElementById('totalLabel').textContent = 'Total Merges';
+            document.getElementById('totalValue').textContent = '{{ stats.overall.total_analyses }}';
+            
+            document.getElementById('impactLabel').textContent = 'Total Impact Points';
+            document.getElementById('impactValue').textContent = '{{ stats.overall.impact_points }}';
+            
+            document.getElementById('changesLabel').textContent = 'Total Code Changes';
+            document.getElementById('changesValue').textContent = '+{{ stats.overall.total_additions }} -{{ stats.overall.total_deletions }}';
+        }
+        
+        // Initialize page based on URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            if (currentAuthorFilter) {
+                // Hide author summary section
+                document.getElementById('authorSummarySection').style.display = 'none';
+                
+                // Update stats for the author
+                updateStatsForAuthor(currentAuthorFilter);
+                
+                // Show analyses for the filtered author
+                const filteredAnalyses = allAnalyses.filter(analysis => analysis.author === currentAuthorFilter);
+                displayAnalyses(filteredAnalyses);
+                
+                // Show selected author info
+                const authorInfo = document.getElementById('selectedAuthorInfo');
+                authorInfo.textContent = `Showing ${filteredAnalyses.length} analyses for ${currentAuthorFilter}`;
+                authorInfo.style.display = 'block';
+                
+                // Update title
+                document.getElementById('analysesTitle').textContent = `Analysis Results - ${currentAuthorFilter}`;
+                
+                // Show container
+                document.getElementById('analysesContainer').classList.add('show');
+                
+                // Show back button
+                document.getElementById('backBtn').style.display = 'inline-block';
+                
+                // Highlight the author in the table
+                const authorLinks = document.querySelectorAll('.author-name');
+                authorLinks.forEach(link => {
+                    if (link.textContent.trim() === currentAuthorFilter) {
+                        link.classList.add('selected');
+                    }
+                });
+            }
+        });
+        
+        function selectAuthor(authorName) {
+            currentFilter = authorName;
+            
+            // Hide author summary section
+            document.getElementById('authorSummarySection').style.display = 'none';
+            
+            // Update stats for the author
+            updateStatsForAuthor(authorName);
+            
+            // Update UI
+            document.querySelectorAll('.author-name').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Filter and display analyses
+            const filteredAnalyses = allAnalyses.filter(analysis => analysis.author === authorName);
+            displayAnalyses(filteredAnalyses);
+            
+            // Show selected author info
+            const authorInfo = document.getElementById('selectedAuthorInfo');
+            authorInfo.textContent = `Showing ${filteredAnalyses.length} analyses for ${authorName}`;
+            authorInfo.style.display = 'block';
+            
+            // Update title
+            document.getElementById('analysesTitle').textContent = `Analysis Results - ${authorName}`;
+            
+            // Show container
+            document.getElementById('analysesContainer').classList.add('show');
+            
+            // Show back button
+            document.getElementById('backBtn').style.display = 'inline-block';
+        }
+        
+        function viewAllAnalyses() {
+            currentFilter = null;
+            
+            // Hide author summary section
+            document.getElementById('authorSummarySection').style.display = 'none';
+            
+            // Reset stats to overall
+            resetStatsToOverall();
+            
+            // Clear selection
+            document.querySelectorAll('.author-name').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Display all analyses
+            displayAnalyses(allAnalyses);
+            
+            // Hide author info
+            document.getElementById('selectedAuthorInfo').style.display = 'none';
+            
+            // Update title
+            document.getElementById('analysesTitle').textContent = `All Analysis Results (${allAnalyses.length} merges)`;
+            
+            // Show container
+            document.getElementById('analysesContainer').classList.add('show');
+            
+            // Show back button
+            document.getElementById('backBtn').style.display = 'inline-block';
+        }
+        
+        function goBack() {
+            // Show author summary section
+            document.getElementById('authorSummarySection').style.display = 'block';
+            
+            // Reset stats to overall
+            resetStatsToOverall();
+            
+            // Hide analyses container
+            document.getElementById('analysesContainer').classList.remove('show');
+            
+            // Hide back button
+            document.getElementById('backBtn').style.display = 'none';
+            
+            // Clear any author selection
+            document.querySelectorAll('.author-name').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Clear current filter
+            currentFilter = null;
+        }
+        
+        function displayAnalyses(analyses) {
+            const tbody = document.getElementById('analysesTableBody');
+            tbody.innerHTML = '';
+            
+            analyses.forEach(analysis => {
+                const row = document.createElement('tr');
+                
+                // Format date
+                let formattedDate = 'N/A';
+                if (analysis.merge_date) {
+                    const date = new Date(analysis.merge_date);
+                    formattedDate = date.toISOString().slice(0, 16).replace('T', ' ');
+                }
+                
+                // Determine score class
+                const score = analysis.impact_score || 1;
+                let scoreClass = 'score-poor';
+                if (score >= 4) scoreClass = 'score-excellent';
+                else if (score >= 3) scoreClass = 'score-good';
+                else if (score >= 2) scoreClass = 'score-average';
+                
+                // Build commit URL with current filters
+                let commitUrl = `/commit/${analysis.merge_hash}`;
+                const urlParams = new URLSearchParams();
+                if (currentAuthorFilter) urlParams.append('author', currentAuthorFilter);
+                if (currentTimeFilter) urlParams.append('time_filter', currentTimeFilter);
+                if (urlParams.toString()) commitUrl += '?' + urlParams.toString();
+                
+                row.innerHTML = `
+                    <td class="author-cell">${analysis.author}</td>
+                    <td class="timestamp-cell">${formattedDate}</td>
+                                         <td>
+                         <a href="${commitUrl}" class="commit-link">
+                             ${analysis.merge_subject}
+                         </a>
+                        <div class="code-changes">
+                            ${analysis.files_changed} files edited, <span class="additions">+${analysis.additions}</span>, <span class="deletions">-${analysis.deletions}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="impact-score ${scoreClass}">
+                            ${score}/5
+                        </span>
+                    </td>
+                    <td class="assessment-cell">
+                        ${analysis.impact_assessment || analysis.summary || 'No assessment available'}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        function createSparkline(distribution) {
+            // Create a simple text-based sparkline for score distribution
+            const bars = [];
+            const maxCount = Math.max(...Object.values(distribution).map(d => d.count));
+            
+            for (let score = 1; score <= 5; score++) {
+                const count = distribution[score]?.count || 0;
+                const height = maxCount > 0 ? Math.round((count / maxCount) * 8) : 0;
+                const bar = '▁▂▃▄▅▆▇█'[height] || '▁';
+                bars.push(bar);
+            }
+            
+            return bars.join('');
+        }
+        
+        function sortTable(columnIndex) {
+            const table = document.querySelector('.author-table tbody');
+            const rows = Array.from(table.rows);
+            
+            rows.sort((a, b) => {
+                const aVal = a.cells[columnIndex].textContent.trim();
+                const bVal = b.cells[columnIndex].textContent.trim();
+                
+                // Handle numeric columns
+                if (columnIndex === 1 || columnIndex === 2) {
+                    // Extract numbers from text (e.g., "123 pts" -> 123)
+                    const aNum = parseFloat(aVal.replace(/[^\d.]/g, '')) || 0;
+                    const bNum = parseFloat(bVal.replace(/[^\d.]/g, '')) || 0;
+                    return bNum - aNum;
+                }
+                
+                // Handle text columns
+                return aVal.localeCompare(bVal);
+            });
+            
+            // Clear and re-add sorted rows
+            table.innerHTML = '';
+            rows.forEach(row => table.appendChild(row));
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eng ctx - Commit Details</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            color: #202124;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+            letter-spacing: -0.5px;
+        }
+
+        .back-link {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 6px 12px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+
+        .back-link:hover {
+            background: #f8f9fa;
+            border-color: #1a73e8;
+        }
+
+        .commit-info {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #5f6368;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fafafa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .commit-details {
+            padding: 24px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #5f6368;
+            min-width: 140px;
+            margin-right: 16px;
+            font-size: 13px;
+        }
+
+        .detail-value {
+            color: #202124;
+            font-size: 13px;
+        }
+
+        .impact-level {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .impact-level-5 {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+        }
+
+        .impact-level-4 {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            box-shadow: 0 2px 4px rgba(243, 156, 18, 0.3);
+        }
+
+        .impact-level-3 {
+            background: linear-gradient(135deg, #f1c40f, #f39c12);
+            box-shadow: 0 2px 4px rgba(241, 196, 15, 0.3);
+        }
+
+        .impact-level-2 {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+        }
+
+        .impact-level-1 {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+            box-shadow: 0 2px 4px rgba(149, 165, 166, 0.3);
+        }
+
+        .commit-hash {
+            font-family: 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border: 1px solid #e0e0e0;
+            font-size: 12px;
+        }
+
+        .changes-summary {
+            display: flex;
+            gap: 16px;
+            margin-top: 4px;
+        }
+
+        .change-item {
+            font-family: 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .additions {
+            color: #137333;
+            font-weight: 500;
+        }
+
+        .deletions {
+            color: #d73a49;
+            font-weight: 500;
+        }
+
+        .files-changed {
+            color: #5f6368;
+            font-weight: 500;
+        }
+
+        .analysis-content {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .analysis-text {
+            padding: 24px;
+            line-height: 1.6;
+            color: #202124;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+
+        .pr-link {
+            color: #1a73e8;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pr-link:hover {
+            text-decoration: underline;
+        }
+
+
+
+        .diff-content {
+            margin-top: 24px;
+        }
+
+        .diff-file {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        .diff-file-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 12px 16px;
+            font-family: 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 500;
+            color: #202124;
+            border-left: 3px solid #1a73e8;
+        }
+
+        .diff-file-path {
+            color: #5f6368;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+
+        .diff-file-content {
+            background: #fff;
+        }
+
+        .diff-line {
+            font-family: 'SF Mono', Monaco, 'Cascadia Mono', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 0 16px;
+            white-space: pre;
+            border-left: 3px solid transparent;
+            display: block;
+        }
+
+        .diff-line-addition {
+            background-color: #e6ffec;
+            border-left-color: #34d058;
+            color: #22863a;
+        }
+
+        .diff-line-deletion {
+            background-color: #ffebe9;
+            border-left-color: #ea4a5a;
+            color: #cb2431;
+        }
+
+        .diff-line-context {
+            background-color: #fff;
+            color: #5f6368;
+        }
+
+        .diff-line-header {
+            background-color: #f8f9fa;
+            color: #202124;
+            font-weight: 500;
+            border-left-color: #1a73e8;
+            padding: 4px 16px;
+        }
+
+        .diff-line-separator {
+            background-color: #f5f5f5;
+            color: #5f6368;
+            border-left-color: #dadce0;
+            font-weight: 500;
+            padding: 4px 16px;
+        }
+
+        .no-diff {
+            padding: 48px;
+            text-align: center;
+            color: #5f6368;
+            font-size: 14px;
+        }
+
+        .error-message {
+            padding: 16px;
+            background: #fce8e6;
+            border: 1px solid #f5c6c0;
+            color: #d33b27;
+            margin: 16px;
+            font-size: 13px;
+        }
+
+        .truncated-message {
+            padding: 12px 16px;
+            background: #fef7e0;
+            border: 1px solid #fde293;
+            color: #b36200;
+            margin: 16px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="header-title">Commit Analysis Details</h1>
+                <a href="/?{% if current_author %}author={{ current_author|urlencode }}&{% endif %}{% if current_time_filter %}time_filter={{ current_time_filter }}&{% endif %}" class="back-link">← Back to Dashboard</a>
+            </div>
+        </div>
+
+        <div class="commit-info">
+            <div class="section-header">
+                Commit Information
+            </div>
+            <div class="commit-details">
+                <div class="detail-row">
+                    <div class="detail-label">Commit Hash:</div>
+                    <div class="detail-value">
+                        <span class="commit-hash">{{ analysis.merge_hash }}</span>
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Author:</div>
+                    <div class="detail-value">{{ analysis.author }}</div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Merge Date:</div>
+                    <div class="detail-value">
+                        {% if analysis.merge_date %}
+                            {{ analysis.merge_date.strftime('%Y-%m-%d %H:%M:%S') }}
+                        {% else %}
+                            {{ analysis.merge_date }}
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Impact Score:</div>
+                    <div class="detail-value">
+                        <span class="impact-level impact-level-{{ analysis.impact_score }}">
+                            {{ analysis.impact_score }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">PR Number:</div>
+                    <div class="detail-value">
+                        {% if analysis.pr_number %}
+                            <a href="{{ analysis.pr_url }}" class="pr-link">#{{ analysis.pr_number }}</a>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Changes:</div>
+                    <div class="detail-value">
+                        <div class="changes-summary">
+                            <div class="change-item">
+                                <span class="additions">+{{ analysis.additions }}</span> additions
+                            </div>
+                            <div class="change-item">
+                                <span class="deletions">-{{ analysis.deletions }}</span> deletions
+                            </div>
+                            <div class="change-item">
+                                <span class="files-changed">{{ analysis.files_changed }}</span> files changed
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div class="detail-row">
+                    <div class="detail-label">Analyzed At:</div>
+                    <div class="detail-value">
+                        {% if analysis.analyzed_at %}
+                            {{ analysis.analyzed_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                        {% else %}
+                            {{ analysis.analyzed_at }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-content">
+            <div class="section-header">
+                Analysis Details
+            </div>
+            <div class="analysis-text">{{ analysis.impact_assessment }}</div>
+        </div>
+
+        {% if diff_content %}
+        <div class="diff-content">
+            {% if '... (diff truncated after' in diff_content %}
+                <div class="truncated-message">
+                    <strong>Note:</strong> This diff has been truncated for display purposes. 
+                    The full diff may contain more changes.
+                </div>
+            {% endif %}
+            {% if diff_content.startswith('Error getting diff:') or diff_content.startswith('Git command failed:') %}
+                <div class="error-message">
+                    <strong>Error:</strong> {{ diff_content }}
+                </div>
+            {% else %}
+                {% set lines = diff_content.split('\n') %}
+                {% set ns = namespace(in_file=False, current_file_path='') %}
+                
+                {% for line in lines %}
+                    {% if line.startswith('diff --git') %}
+                        {% if ns.in_file %}
+                            </div></div>
+                        {% endif %}
+                        {% set file_path = line.split(' b/')[1] if ' b/' in line else line.split(' ')[-1] %}
+                        {% set ns.current_file_path = file_path %}
+                        {% set ns.in_file = True %}
+                        <div class="diff-file">
+                            <div class="diff-file-header">
+                                {{ file_path.split('/')[-1] }}
+                                <span class="diff-file-path">{{ file_path }}</span>
+                            </div>
+                            <div class="diff-file-content">
+                    {% elif line.startswith('index ') %}
+                        {# Skip index lines - not useful for display #}
+                    {% elif line.startswith('+++') or line.startswith('---') %}
+                        {# Skip +++ and --- lines - filename already shown in header #}
+                    {% elif line.startswith('@@') %}
+                        <div class="diff-line diff-line-separator">{{ line }}</div>
+                    {% elif line.startswith('+') %}
+                        <div class="diff-line diff-line-addition">{{ line }}</div>
+                    {% elif line.startswith('-') %}
+                        <div class="diff-line diff-line-deletion">{{ line }}</div>
+                    {% elif line.startswith('... (diff truncated after') %}
+                        <div class="diff-line diff-line-separator">{{ line }}</div>
+                    {% else %}
+                        <div class="diff-line diff-line-context">{{ line if line else ' ' }}</div>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if ns.in_file %}
+                    </div></div>
+                {% endif %}
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="diff-content">
+            <div class="diff-file">
+                <div class="diff-file-content">
+                    <div class="no-diff">
+                        No diff content available for this commit.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html> 
