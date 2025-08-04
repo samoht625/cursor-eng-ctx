@@ -248,20 +248,6 @@ def parse_relative_date(date_string: str) -> datetime:
         raise ValueError(f"Unknown time unit: {unit}")
 
 
-def load_users(users_input: str) -> List[str]:
-    """Load users from comma-separated string or config file."""
-    if ',' in users_input:
-        # Comma-separated list
-        return [u.strip() for u in users_input.split(',') if u.strip()]
-    elif os.path.isfile(users_input):
-        # File path
-        with open(users_input, 'r') as f:
-            return [line.strip() for line in f if line.strip() and not line.startswith('#')]
-    else:
-        # Single user
-        return [users_input.strip()]
-
-
 def run_git_command(cmd: List[str], cwd: str) -> str:
     """Run a git command and return the output."""
     try:
@@ -689,60 +675,8 @@ def get_all_users_from_repo(repo_path: str, since_date: datetime) -> List[str]:
         return []
 
 
-def prompt_for_users(repo_path: str, since_date: datetime) -> List[str]:
-    """Prompt user for which users to analyze."""
-    # Get all users from the repository
-    all_users = get_all_users_from_repo(repo_path, since_date)
-    
-    if not all_users:
-        click.echo("No users found in repository for the specified date range.", err=True)
-        sys.exit(1)
-    
-    click.echo(f"\nFound {len(all_users)} users in repository since {since_date.strftime('%Y-%m-%d')}:")
-    for i, user in enumerate(all_users, 1):
-        click.echo(f"  {i}. {user}")
-    
-    click.echo("\nOptions:")
-    click.echo("  - Press Enter to analyze ALL users")
-    click.echo("  - Enter comma-separated usernames (e.g., 'John Doe,jane@example.com')")
-    click.echo("  - Enter numbers (e.g., '1,3,5' for users 1, 3, and 5)")
-    
-    user_input = input("\nEnter your choice: ").strip()
-    
-    if not user_input:
-        # Return all users
-        return all_users
-    
-    # Check if input is numbers
-    if all(part.strip().isdigit() for part in user_input.split(',')):
-        # User entered numbers
-        try:
-            numbers = [int(part.strip()) for part in user_input.split(',')]
-            selected_users = []
-            for num in numbers:
-                if 1 <= num <= len(all_users):
-                    selected_users.append(all_users[num - 1])
-                else:
-                    click.echo(f"Warning: Invalid user number {num}, skipping.", err=True)
-            return selected_users
-        except ValueError:
-            click.echo("Error: Invalid number format.", err=True)
-            sys.exit(1)
-    else:
-        # User entered usernames
-        requested_users = [user.strip() for user in user_input.split(',')]
-        selected_users = []
-        for user in requested_users:
-            if user in all_users:
-                selected_users.append(user)
-            else:
-                click.echo(f"Warning: User '{user}' not found in repository, skipping.", err=True)
-        return selected_users
-
-
 @click.command()
 @click.option('--since', help='Timestamp or relative time (e.g., "1 week ago")')
-@click.option('--users', help='CSV of users or path to config file (optional - will prompt if not provided)')
 @click.option('--repo', envvar='REPO_PATH', help='Path to local git repository (or set REPO_PATH environment variable)')
 
 @click.option('--openai-key', envvar='OPENAI_API_KEY', help='OpenAI API key (or set OPENAI_API_KEY environment variable or use .env file)')
@@ -750,7 +684,7 @@ def prompt_for_users(repo_path: str, since_date: datetime) -> List[str]:
 @click.option('--include-diff', is_flag=True, help='Include code diff in LLM analysis (may increase API costs)')
 @click.option('--clear-cache', is_flag=True, help='Clear the LLM response cache before running')
 @click.option('--cache-stats', is_flag=True, help='Show cache statistics and exit')
-def main(since: str, users: str, repo: str, openai_key: str, model: str, include_diff: bool, clear_cache: bool, cache_stats: bool):
+def main(since: str, repo: str, openai_key: str, model: str, include_diff: bool, clear_cache: bool, cache_stats: bool):
     """Analyze local git repository merges and score them based on AI Measurement Framework."""
     
     # Handle cache operations
@@ -769,7 +703,7 @@ def main(since: str, users: str, repo: str, openai_key: str, model: str, include
         click.echo("Error: --since is required for analysis", err=True)
         sys.exit(1)
     
-    # Parse dates first (needed for user prompt)
+    # Parse dates first
     try:
         since_date = parse_relative_date(since)
         click.echo(f"Analyzing merges since: {since_date.strftime('%Y-%m-%d %H:%M:%S')}")
@@ -777,11 +711,11 @@ def main(since: str, users: str, repo: str, openai_key: str, model: str, include
         click.echo(f"Error parsing date: {e}", err=True)
         sys.exit(1)
     
-    # Handle users - prompt if not provided
-    if not users:
-        user_list = prompt_for_users(repo, since_date)
-    else:
-        user_list = load_users(users)
+    # Get all users from the repository
+    user_list = get_all_users_from_repo(repo, since_date)
+    if not user_list:
+        click.echo("No users found in repository for the specified date range.", err=True)
+        sys.exit(1)
     
     if not repo:
         click.echo("Error: --repo is required for analysis", err=True)
@@ -800,8 +734,7 @@ def main(since: str, users: str, repo: str, openai_key: str, model: str, include
         click.echo(f"Error: Not a git repository: {repo}", err=True)
         sys.exit(1)
     
-    # User list already loaded above
-    click.echo(f"Analyzing merges for users: {', '.join(user_list)}")
+    click.echo(f"Analyzing merges for all users: {', '.join(user_list)}")
     click.echo(f"Repository: {repo}")
     
     # Initialize OpenAI client
@@ -840,8 +773,6 @@ def main(since: str, users: str, repo: str, openai_key: str, model: str, include
     if not pr_data:
         click.echo("No merges found involving the specified users.")
         return
-    
-    click.echo(f"\nFound {len(pr_data)} merges to analyze.")
     
     # Filter revert chains before scoring
     click.echo(f"\nFiltering revert chains...")

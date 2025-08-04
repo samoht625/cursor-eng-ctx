@@ -62,12 +62,13 @@ cp .env.example .env
 The main parameter you need is `--since` to specify the time period to analyze:
 
 ```bash
-python3 analyze_prs.py --since "1 week ago" --users users-config.txt
+python3 analyze_prs.py --since "1 week ago"
 ```
 
 **Required parameters:**
 - `--since`: Time period to analyze (e.g., "1 week ago", "2 months ago", "2024-01-01")
-- `--users`: List of users to analyze (CSV string or path to config file)
+
+The tool will automatically analyze all users who have commits in the repository during the specified time period.
 
 Make sure you have set up your `.env` file with your OpenAI API key and repository path before running the analysis.
 
@@ -78,9 +79,6 @@ Make sure you have set up your `.env` file with your OpenAI API key and reposito
   - Examples: `"1 week ago"`, `"2 months ago"`, `"2024-01-01"`
 
 **Advanced Parameters:**
-- `--users`: CSV of users or path to config file (required)
-  - Examples: `"user1,user2,user3"` or `users-config.txt`
-  
 - `--model`: OpenAI model to use (default: `gpt-4`, can also use `gpt-3.5-turbo` for lower costs)
 
 - `--clear-cache`: Clear the LLM response cache before running
@@ -91,25 +89,25 @@ Make sure you have set up your `.env` file with your OpenAI API key and reposito
 
 **Basic usage - just specify the time period:**
 ```bash
-python3 analyze_prs.py --since "1 week ago" --users users-config.txt
+python3 analyze_prs.py --since "1 week ago"
 ```
 
 **Analyze different time periods:**
 ```bash
 # Last 2 weeks
-python3 analyze_prs.py --since "2 weeks ago" --users "rnvarma,ehong97,ajhoffman"
+python3 analyze_prs.py --since "2 weeks ago"
 
 # Last month
-python3 analyze_prs.py --since "1 month ago" --users users-config.txt
+python3 analyze_prs.py --since "1 month ago"
 
 # Since specific date
-python3 analyze_prs.py --since "2024-01-01" --users users-config.txt
+python3 analyze_prs.py --since "2024-01-01"
 ```
 
 **Advanced options:**
 ```bash
 # Use GPT-3.5-turbo for lower costs
-python3 analyze_prs.py --since "1 week ago" --users users-config.txt --model gpt-3.5-turbo
+python3 analyze_prs.py --since "1 week ago" --model gpt-3.5-turbo
 ```
 
 ## Output
@@ -149,37 +147,20 @@ Based on the DX AI Measurement Framework, merges are scored on:
 5. **Team Collaboration (0-10)**: Evidence of effective collaboration
 6. **Overall Score (0-100)**: Weighted combination of all dimensions
 
-## Users Config File Format
-
-The `users-config.txt` file should contain one git author name per line:
-
-```
-rnvarma
-ehong97
-ajhoffman
-# Comments are supported with #
-```
-
-**Note:** The author names should match exactly what appears in your git commit history. You can check author names with:
-```bash
-git log --pretty=format:"%an" | sort | uniq
-```
-
 ## How It Works
 
 The tool:
 1. Finds all merge commits in the specified time period
 2. For each merge, identifies commits that were part of the "PR" (commits between the merge and its parent)
-3. Filters for commits by the specified authors
-4. Analyzes each merge using OpenAI to score it on the AI Measurement Framework
-5. Saves results to SQLite database with caching for efficiency
+3. Analyzes each merge using OpenAI to score it on the AI Measurement Framework
+4. Saves results to SQLite database with caching for efficiency
 
 ## Troubleshooting
 
 **Common Issues:**
 - "Not a git repository": Make sure the `REPO_PATH` in your `.env` file points to a valid git repository
 - "No merge commits found": The repository might not have merge commits in the specified time period
-- "No merges found involving the specified users": Check that the author names match exactly
+- "No users found in repository": The repository might not have any commits in the specified time period
 - "No diff content available": Make sure `REPO_PATH` is set in your `.env` file to point to the repository you analyzed
 - OpenAI errors: Verify your API key in the `.env` file and available credits
 
