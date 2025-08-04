@@ -35,22 +35,12 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip3 install -r requirements.txt
 ```
 
-4. Set up your OpenAI API key (choose one method):
+4. Set up your OpenAI API key:
 
-**Option A: .env file (recommended):**
+Create a `.env` file with your configuration:
 ```bash
 cp .env.example .env
-# Edit .env and replace with your actual API key and repository path
-```
-
-**Option B: Environment variable:**
-```bash
-export OPENAI_API_KEY=your_openai_api_key_here
-```
-
-**Option C: Command line argument:**
-```bash
-python3 analyze_prs.py --openai-key your_openai_api_key_here --since "1 week ago" --users users-config.txt --repo /path/to/your/repo
+# Edit .env and add your OpenAI API key and repository path
 ```
 
 ### Getting API Keys
@@ -61,12 +51,9 @@ python3 analyze_prs.py --openai-key your_openai_api_key_here --since "1 week ago
 3. Copy the generated key
 
 **Repository Path:**
-- Both the analysis script and web interface can use the `REPO_PATH` environment variable
 - Set `REPO_PATH` in your `.env` file to point to the repository you want to analyze
 - Example: `REPO_PATH=/Users/yourname/projects/your-repo`
-- For analysis: makes `--repo` argument optional
-- For web interface: enables diff viewing when repo_path isn't stored in database
-- If not set, analysis script requires `--repo` argument, web app defaults to current directory
+- This enables diff viewing in the web interface and makes the `--repo` argument optional for analysis
 
 ## Usage
 
@@ -74,24 +61,11 @@ python3 analyze_prs.py --openai-key your_openai_api_key_here --since "1 week ago
 
 Analyze merges from the last week for users in the config file:
 
-**If you use a .env file (recommended):**
 ```bash
-cp .env.example .env
-# Edit .env and add your API key and repository path, then run:
 python3 analyze_prs.py --since "1 week ago" --users users-config.txt
-# The --repo argument is optional if REPO_PATH is set in .env
 ```
 
-**If you set the environment variable:**
-```bash
-export OPENAI_API_KEY=your_api_key_here
-python3 analyze_prs.py --since "1 week ago" --users users-config.txt --repo /path/to/your/repo
-```
-
-**Or pass it directly:**
-```bash
-python3 analyze_prs.py --openai-key your_api_key_here --since "1 week ago" --users users-config.txt --repo /path/to/your/repo
-```
+Make sure you have set up your `.env` file with your OpenAI API key and repository path before running the analysis.
 
 ### Command-Line Options
 
@@ -101,13 +75,7 @@ python3 analyze_prs.py --openai-key your_api_key_here --since "1 week ago" --use
 - `--users`: CSV of users or path to config file (required)
   - Examples: `"user1,user2,user3"` or `users-config.txt`
   
-- `--repo`: Path to local git repository (or set REPO_PATH environment variable)
-  
-
-
 - `--model`: OpenAI model to use (default: `gpt-4`, can also use `gpt-3.5-turbo` for lower costs)
-
-- `--openai-key`: OpenAI API key (optional if set in .env file or OPENAI_API_KEY environment variable)
 
 - `--clear-cache`: Clear the LLM response cache before running
 
@@ -117,20 +85,17 @@ python3 analyze_prs.py --openai-key your_api_key_here --since "1 week ago" --use
 
 1. Analyze merges from the last 2 weeks for specific users:
 ```bash
-python3 analyze_prs.py --since "2 weeks ago" --users "rnvarma,ehong97,ajhoffman" --repo /path/to/repo
-# Or if REPO_PATH is set in .env:
 python3 analyze_prs.py --since "2 weeks ago" --users "rnvarma,ehong97,ajhoffman"
 ```
 
 2. Use a config file for users:
 ```bash
-python3 analyze_prs.py --since "1 month ago" --users users-config.txt --repo /path/to/repo
+python3 analyze_prs.py --since "1 month ago" --users users-config.txt
 ```
 
 3. Analyze merges since a specific date:
 ```bash
 python3 analyze_prs.py --since "2024-01-01" --users users-config.txt
-# Assumes REPO_PATH is set in .env
 ```
 
 4. Use GPT-3.5-turbo for lower costs:
@@ -203,11 +168,11 @@ The tool:
 ## Troubleshooting
 
 **Common Issues:**
-- "Not a git repository": Make sure the path points to a valid git repository
+- "Not a git repository": Make sure the `REPO_PATH` in your `.env` file points to a valid git repository
 - "No merge commits found": The repository might not have merge commits in the specified time period
 - "No merges found involving the specified users": Check that the author names match exactly
-- "No diff content available": Set `REPO_PATH` in your `.env` file to point to the repository you analyzed
-- OpenAI errors: Verify your API key and available credits
+- "No diff content available": Make sure `REPO_PATH` is set in your `.env` file to point to the repository you analyzed
+- OpenAI errors: Verify your API key in the `.env` file and available credits
 
 ## Cost Considerations
 
