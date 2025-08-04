@@ -2,6 +2,8 @@
 
 A command-line tool that analyzes local git repository merges and scores them based on the AI Measurement Framework from the article ["Engineering KPIs in the Age of AI"](https://engineeredintelligence.substack.com/p/engineering-kpis-in-the-age-of-ai).
 
+![Demo Screenshot](demo-screenshot.png)
+
 ## Features
 
 - Analyzes merge commits from local git repositories
